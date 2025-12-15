@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        
+        .number-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .number-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+
+</head>
+
+<body class="bg-gray-50">
+    <div class="title text-center font-bold text-2xl mt-5 px-10 py-4">
+        Selamat Datang Di Kalkulator
+    </div>
+    
+    {{if .Result}}
+    <div class="max-w-md mx-auto mb-4 px-4">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+            <strong>Hasil: </strong> {{.Result}}
+        </div>
+    </div>
+    {{end}}
+    
+    <div class="con-form min-h-[80vh] flex items-center justify-center px-4">
+        <form method="POST" class="
+            bg-white border-4 border-gray-300 rounded-xl p-6 
+            shadow-lg w-full max-w-md
+        " action="/calculate">
+            
+            <input type="text" 
+                   id="calculatorInput"
+                   name="expression"
+                   class="border-4 border-gray-300 w-full p-4 text-2xl text-right mb-6 rounded-lg
+                          focus:outline-none focus:border-blue-500"
+                   placeholder="0"
+                   readonly>
+            
+            <div class="grid grid-cols-4 gap-3 mb-4">
+                <button type="button" onclick="clearInput()"
+                        class="number-btn bg-red-500 hover:bg-red-600 text-white p-4 rounded-lg text-xl font-bold">
+                    C
+                </button>
+                <button type="button" onclick="deleteLast()"
+                        class="number-btn bg-yellow-500 hover:bg-yellow-600 text-white p-4 rounded-lg text-xl font-bold">
+                    ⌫
+                </button>
+                <button type="button" onclick="addOperator('/')"
+                        class="number-btn bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg text-xl font-bold">
+                    ÷
+                </button>
+                <button type="button" onclick="addOperator('*')"
+                        class="number-btn bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg text-xl font-bold">
+                    ×
+                </button>
+                
+                <button type="button" onclick="addNumber('7')"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl">
+                    7
+                </button>
+                <button type="button" onclick="addNumber('8')"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl">
+                    8
+                </button>
+                <button type="button" onclick="addNumber('9')"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl">
+                    9
+                </button>
+                <button type="button" onclick="addOperator('-')"
+                        class="number-btn bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg text-xl font-bold">
+                    −
+                </button>
+                
+                <button type="button" onclick="addNumber('4')"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl">
+                    4
+                </button>
+                <button type="button" onclick="addNumber('5')"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl">
+                    5
+                </button>
+                <button type="button" onclick="addNumber('6')"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl">
+                    6
+                </button>
+                <button type="button" onclick="addOperator('+')"
+                        class="number-btn bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg text-xl font-bold">
+                    +
+                </button>
+                
+                <button type="button" onclick="addNumber('1')"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl col-span-1">
+                    1
+                </button>
+                <button type="button" onclick="addNumber('2')"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl">
+                    2
+                </button>
+                <button type="button" onclick="addNumber('3')"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl">
+                    3
+                </button>
+                <button type="button" onclick="calculate()"
+                        class="number-btn bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg text-xl font-bold row-span-2">
+                    =
+                </button>
+                
+                <button type="button" onclick="addNumber('0')"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl col-span-2">
+                    0
+                </button>
+                <button type="button" onclick="addDecimal()"
+                        class="number-btn bg-gray-100 hover:bg-gray-200 p-4 rounded-lg text-xl">
+                    .
+                </button>
+            </div>
+            
+            <input type="hidden" id="resultInput" name="result">
+            
+            <button type="submit" 
+                    class="w-full bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg text-xl font-bold mt-4">
+                Kirim ke Server
+            </button>
+            
+        </form>
+    </div>
+
+    <script>
+        const input = document.getElementById('calculatorInput');
+        const resultInput = document.getElementById('resultInput');
+        let currentExpression = '';
+        
+        function addNumber(number) {
+            if (input.value === '0' || currentExpression === '') {
+                input.value = number;
+                currentExpression = number;
+            } else {
+                input.value += number;
+                currentExpression += number;
+            }
+        }
+        
+        function addOperator(operator) {
+            if (currentExpression !== '') {
+                input.value += ' ' + operator + ' ';
+                currentExpression += operator;
+            }
+        }
+        
+        function addDecimal() {
+            if (!input.value.includes('.')) {
+                input.value += '.';
+                currentExpression += '.';
+            }
+        }
+        
+        function clearInput() {
+            input.value = '';
+            currentExpression = '';
+            resultInput.value = '';
+        }
+        
+        function deleteLast() {
+            input.value = input.value.slice(0, -1);
+            currentExpression = currentExpression.slice(0, -1);
+            if (input.value === '') {
+                input.value = '';
+                currentExpression = '';
+            }
+        }
+        
+        function calculate() {
+            try {
+                let expression = currentExpression
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/');
+                
+                const result = eval(expression);
+                input.value = result;
+                currentExpression = result.toString();
+                resultInput.value = result;
+            } catch (error) {
+                input.value = 'Error';
+                currentExpression = '';
+                resultInput.value = '';
+                setTimeout(() => {
+                    input.value = '';
+                }, 1500);
+            }
+        }
+        
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            if (key >= '0' && key <= '9') {
+                addNumber(key);
+            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                addOperator(key);
+            } else if (key === '.') {
+                addDecimal();
+            } else if (key === 'Enter') {
+                event.preventDefault();
+                calculate();
+            } else if (key === 'Escape' || key === 'Delete') {
+                clearInput();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            }
+        });
+        
+        document.querySelector('form').addEventListener('submit', function() {
+            resultInput.value = input.value;
+        });
+    </script>
+</body>
+
+</html>
