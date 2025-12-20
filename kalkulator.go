@@ -9,8 +9,11 @@ func main() {
     var operator string
     var hasil float64
     var error string
+    var status bool
+
+    status = false
     
-    for {
+    for !status {
         error = ""
         
         fmt.Print("\nMasukkan angka pertama: ")
@@ -50,7 +53,7 @@ func main() {
         
         if pilihan != "y" && pilihan != "Y" {
             fmt.Println("Terima kasih!")
-            break
+            status = true
         }
     }
 }
